@@ -18,16 +18,18 @@ def main_fn(barcode_path, code=None):
 
         cwd = os.path.join(barcode_path, item)
         
-        parent_our_dir = os.path.join(barcode_path, 'output2')
-        if not os.path.exists(parent_our_dir):
-            os.mkdir(parent_our_dir)
-        out_dir = os.path.join(parent_our_dir, item)
-        
+        parent_out_dir = os.path.join(barcode_path, 'output2')
+        parent_cat_dir = os.path.join(barcode_path,'cat')
+        if not os.path.exists(parent_cat_dir):
+            os.mkdir(parent_cat_dir)
+        if not os.path.exists(parent_out_dir):
+            os.mkdir(parent_out_dir)
+        out_dir = os.path.join(parent_out_dir, item)
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
         files_in_directory = subprocess.run(["ls"], capture_output=True, text=True, shell=True, cwd=cwd)
         file_list = files_in_directory.stdout.split()
-        output_file = os.path.join(out_dir, f'{item}.gz')
+        output_file = os.path.join(parent_cat_dir, f'{item}.gz')
         
         with open(output_file, 'w') as file:
             cat_process = subprocess.run(["cat"] +file_list, cwd=cwd, stdout=file)
