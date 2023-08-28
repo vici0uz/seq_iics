@@ -15,8 +15,6 @@ def main_fn(barcode_path, code=None):
                 listado_directorios.append(item)
     
     for index, item in enumerate(listado_directorios):
-        # if index >0:
-        #     break
 
         cwd = os.path.join(barcode_path, item)
         
@@ -29,9 +27,6 @@ def main_fn(barcode_path, code=None):
             os.mkdir(out_dir)
         files_in_directory = subprocess.run(["ls"], capture_output=True, text=True, shell=True, cwd=cwd)
         file_list = files_in_directory.stdout.split()
-
-        
-        # print(file_list)
         output_file = os.path.join(out_dir, f'{item}.gz')
         
         with open(output_file, 'w') as file:
