@@ -1,12 +1,11 @@
+#!/home/user/miniconda3/bin/python
 import os
 import subprocess
 import argparse
 
 
 def main_fn(barcode_path, code=None):
-
     contenido  = os.listdir(barcode_path)
-
     listado_directorios = []
 
     for item in contenido:
@@ -15,11 +14,9 @@ def main_fn(barcode_path, code=None):
                 listado_directorios.append(item)
     
     for index, item in enumerate(listado_directorios):
-
         cwd = os.path.join(barcode_path, item)
-        
-        parent_out_dir = os.path.join(barcode_path, 'output2')
-        parent_cat_dir = os.path.join(barcode_path,'cat')
+        parent_out_dir = os.path.join(barcode_path, 'output3')
+        parent_cat_dir = os.path.join(barcode_path,'cat2')
         if not os.path.exists(parent_cat_dir):
             os.mkdir(parent_cat_dir)
         if not os.path.exists(parent_out_dir):
@@ -33,7 +30,6 @@ def main_fn(barcode_path, code=None):
         
         with open(output_file, 'w') as file:
             cat_process = subprocess.run(["cat"] +file_list, cwd=cwd, stdout=file)
-        
         p = subprocess.Popen(['NanoPlot', '-t','20', '--tsv_stats', '--drop_outliers', '--fastq', f'{output_file}', '--plots', 'dot', 'kde', '-o', f'{out_dir}',  '--info_in_report', '--verbose'], cwd=cwd)
         p.wait()
 
