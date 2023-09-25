@@ -14,6 +14,7 @@ process convertToUpper {
     path x
   output:
     stdout
+  println('ok')
   """
   cat $x | tr '[a-z]' '[A-Z]'
   """
