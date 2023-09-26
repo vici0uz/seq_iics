@@ -16,14 +16,16 @@ data in data/input containing
 
 ```
 {
-	"samples": "your_samplesheet.tsv",
+	"sample": "your_samplesheet.tsv",
     "reference": "your_reference.fasta"
 }
 ```
-
+Execute on linux or wsl terminal
 ```
 git clone 'https://github.com/vici0uz/seq_iics'
 cd seq_iics
+mkdir -p data/input
+# copy your data to project data/input directory
 nextflow run main.nf --data {myDataDir} --with-docker vici0uz/iics:latest
 ```
 
