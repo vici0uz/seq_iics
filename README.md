@@ -30,7 +30,7 @@ git clone 'https://github.com/vici0uz/seq_iics'
 cd seq_iics
 mkdir -p data/input
 # copy your data to project data/input directory
-nextflow run main.nf --data {myDataDir} --with-docker vici0uz/iics:latest
+nextflow run main.nf --data {myDataDir} -with-docker vici0uz/iics:latest
 ```
 ## Tools used
 - [Nanoplot](https://github.com/wdecoster/NanoPlot)
