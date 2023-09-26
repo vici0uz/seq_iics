@@ -1,5 +1,9 @@
 # GET_CONSENSUS (AMPLICONES)
 
+[TOC]
+
+
+
 Run pipeline via [nextflow](https://www.nextflow.io/). Notes on building and pushing Docker image are [here](https://hub.docker.com/layers/vici0uz/iics/latest/images/sha256-1c11f1fa0b9a1d3f5cb9a7f7e9e6eb97dfc23b00ea3b3fd3e44ff6bd00c8b068?context=repo)
 
 ## REQUIREMENTS
@@ -9,7 +13,7 @@ Run pipeline via [nextflow](https://www.nextflow.io/). Notes on building and pus
 
 ## SETUP
 data in data/input containing
-- barcodes
+- barcoded | demultiplexed fastq files
 - your_samplesheet.tsv
 - your_reference.fasta
 - a config.json file with the following structure
@@ -28,4 +32,8 @@ mkdir -p data/input
 # copy your data to project data/input directory
 nextflow run main.nf --data {myDataDir} --with-docker vici0uz/iics:latest
 ```
-
+## Tools used
+- [Nanoplot](https://github.com/wdecoster/NanoPlot)
+- [Minimap2](https://github.com/lh3/minimap2)
+- [Samtools](https://github.com/samtools/)
+- [iVar](https://github.com/andersen-lab/ivar)
