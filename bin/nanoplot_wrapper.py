@@ -1,4 +1,4 @@
-#!/home/user/miniconda3/bin/python
+#!/usr/bin/env python
 import os
 import subprocess
 import argparse
@@ -25,7 +25,7 @@ def main_fn(barcode_path, output_path, samples):
     path_samples = os.path.join(barcode_path, samples)
     
     with open(path_samples, 'r') as samples_file:
-        samples_reader =  csv.DictReader(samples_file,['sample', 'barcode'], delimiter="\t")
+        samples_reader =  csv.DictReader(samples_file, ['sample', 'barcode'], delimiter="\t")
         for row in samples_reader:
             filas.append(row)
     for item in contenido:
@@ -35,7 +35,8 @@ def main_fn(barcode_path, output_path, samples):
     
     for index, item in enumerate(listado_directorios):
         if index >0:
-            break
+            # break
+            pass
 
         item_data = mysplit(item)
         dir_number = int(item_data[1])
