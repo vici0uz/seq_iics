@@ -12,7 +12,7 @@ data in data/input containing
 - barcodes
 - your_samplesheet.tsv
 - your_reference.fasta
-- a config.json file with next structure
+- a config.json file with the following structure
 
 ```
 {
