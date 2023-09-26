@@ -23,7 +23,7 @@ process nanoplotDocker {
         stdout
     script:
     """
-    nanoplot_wrapper.py -p ${baseDir}/data/input/${params.data} -o ${baseDir}/data/output/${params.data}_${timestamp.format("dd-MM-yyyy_HH_mm_ss")} -s ${baseDir}/data/input/${myConfig.sample}
+    nanoplot_wrapper.py -p ${baseDir}/data/input/${params.data} -o ${baseDir}/data/output/${params.data}_${timestamp.format("dd-MM-yyyy_HH_mm_ss")} -s ${baseDir}/data/input/${params.data}/${myConfig.sample}
     """
 }
 
