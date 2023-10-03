@@ -26,7 +26,7 @@ data in data/input containing
 ```
 Execute on linux or wsl terminal
 ```
-git clone 'https://github.com/vici0uz/seq_iics'
+git clone 'https://github.com/Seq-IICS/seq_iics.git'
 cd seq_iics
 mkdir -p data/input
 # copy your data to project data/input directory
