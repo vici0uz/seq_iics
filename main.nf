@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 nextflow.enable.dsl=2
 
 // params.options = 'config.json'
+params.q = false
 
 def jsonSlurper = new JsonSlurper()
 def baseDir = baseDir
@@ -15,6 +16,20 @@ String configJSON = configFile.text
 def myConfig = jsonSlurper.parseText(configJSON)
 
 timestamp = workflow.start
+treshold = 0.5
+depth = 600000
+min_map_q = 20
+
+
+if (myConfig.treshold){
+    treshold = myConfig.treshold
+}
+if (myConfig.min_map_q) {
+    min_map_q = myConfig.min_map_q
+}
+if (myConfig.depth) {
+    depth = myConfig.depth
+}
 
 process nanoplotDocker {
     input:
@@ -42,14 +57,26 @@ process getConsensus {
     outputDir=${baseDir}/data/output/${params.data}_${timestamp.format("dd-MM-yyyy_HH_mm_ss")}/cats
     cd \$outputDir
     cp ${baseDir}/data/input/${params.data}/${myConfig.reference} \$outputDir
+    #cp ${baseDir}/data/input/${params.data}/${myConfig.genes} \$outputDir
     for i in \${myArray[@]}; do
         echo "Processing \$i"
         minimap2 -a ${myConfig.reference} \${i}.gz > \${i}.sam
         samtools view \${i}.sam > \${i}.bam
         samtools sort \${i}.sam > \${i}_sorted.bam
         samtools index \${i}_sorted.bam
-        samtools mpileup -d 600000 -A -Q 0 \${i}_sorted.bam | ivar consensus -p \${i}_cns.fasta -q 20  -t 0.5 -n N
+        samtools mpileup -d ${depth} -A -Q 0 \${i}_sorted.bam | ivar consensus -p \${i}_cns.fasta -q ${min_map_q}  -t ${treshold} -n N
+        # NUEVO
+        #samtools fasta \${i}_sorted.bam > \${i}_converted.fasta
+        #/usr/local/bin/quast.py -r ${myConfig.reference} -g ${myConfig.genes} \${i}_converted.fasta
+
     done
+    """
+}
+// quast
+process assemblyQualityControl {
+    script:
+    """
+    echo 
     """
 }
 
@@ -65,6 +92,6 @@ process nanoplot {
 }
 
 workflow {
-
+    // nanoplotDocker | view
     nanoplotDocker | getConsensus | view
 }

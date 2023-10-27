@@ -12,13 +12,15 @@ def mysplit(s):
 
 def getVal(num, tab):
     for index, row in enumerate(tab):
-        if index >0:		
-            if int(row['barcode']) == num:
-                return row['sample'].split('/')[0]
+    # if index >0:		
+        if int(row['barcode']) == num:
+            return row['sample'].split('/')[0]
 
 
 def main_fn(barcode_path, output_path, samples):
-    contenido  = os.listdir(barcode_path)
+    # contenido  = os.listdir(barcode_path)
+    lista_barcodes = []
+    contenido = []
     listado_directorios = []
     filas = []
     code_names = []
@@ -26,20 +28,25 @@ def main_fn(barcode_path, output_path, samples):
     
     with open(path_samples, 'r') as samples_file:
         samples_reader =  csv.DictReader(samples_file, ['sample', 'barcode'], delimiter="\t")
-        for row in samples_reader:
-            filas.append(row)
-    for item in contenido:
-        if os.path.isdir(os.path.join(barcode_path, item)):
-            if((item.startswith('barcode')) and not(item.endswith('a'))):
-                listado_directorios.append(item)
-    
+        for index, row in enumerate(samples_reader):
+            if index > 0:
+                filas.append(row)
+                listado_directorios.append('barcode'+row['barcode'])
+            
+    # for item in contenido:
+    #     if os.path.isdir(os.path.join(barcode_path, item)):
+    #         if((item.startswith('barcode')) and not(item.endswith('a'))):
+    #             listado_directorios.append(item)
+    # print('listado')
+    # print(listado_directorios)
     for index, item in enumerate(listado_directorios):
-        if index >0:
+        if index >1:
             # break
             pass
 
         item_data = mysplit(item)
         dir_number = int(item_data[1])
+        # print(dir_number)
         new_file_name = getVal(dir_number, filas)
         code_names.append(new_file_name)
         cwd = os.path.join(barcode_path, item)
