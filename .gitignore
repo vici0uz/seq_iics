@@ -1,4 +1,7 @@
 *.pyc
 cd
 *.log*
-
+input
+output
+work
+.nextflow
