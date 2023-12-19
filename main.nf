@@ -1,6 +1,7 @@
 
+@Grab(group='commons-io', module='commons-io', version='2.11.0')
 import groovy.json.JsonSlurper
-
+import org.apache.commons.io.FileUtils
 nextflow.enable.dsl=2
 
 // params.options = 'config.json'
@@ -8,9 +9,14 @@ params.q = false
 
 def jsonSlurper = new JsonSlurper()
 def baseDir = baseDir
+systemSeparator = System.getProperty("file.separator")
 
-def configFile = new File("${baseDir}/data/input/${params.data}/config.json")
+def configFile = new File("${params.path}/config.json")
 
+String[] pathList = "${params.path}".split("${systemSeparator}")
+lastDir = pathList[pathList.size() - 1]
+def outputDir = new File("${params.output}")
+def tmpOutputDir = new File("${baseDir}/output")
 String configJSON = configFile.text
 
 def myConfig = jsonSlurper.parseText(configJSON)
@@ -31,20 +37,38 @@ if (myConfig.depth) {
     depth = myConfig.depth
 }
 
-process nanoplotDocker {
+def inputPath = new File(params.path)
+def inputDir = new File("${baseDir}/input")
+def copyOutputFiles(){
+    try{
+        tmpOutputPathStr = "${baseDir}/output/${lastDir}_${timestamp.format("dd-MM-yyyy_HH_mm_ss")}"
+        tmpOutputPath = new File(tmpOutputPathStr);
+        
+        FileUtils.copyDirectoryToDirectory(tmpOutputPath, outputDir)
+    }catch(e) {
+        e.printStackTrace();
+    }
+}
+
+try {
+        
+        FileUtils.copyDirectoryToDirectory(inputPath, inputDir);
+    } catch (e) {
+        e.printStackTrace();
+    }
+
+process nanoplotWrapper {
     input:
         myConfig
     output:
         stdout
     script:
     """
-    nanoplot_wrapper.py -p ${baseDir}/data/input/${params.data} -o ${baseDir}/data/output/${params.data}_${timestamp.format("dd-MM-yyyy_HH_mm_ss")} -s ${baseDir}/data/input/${params.data}/${myConfig.sample}
+    nanoplot_wrapper.py -p ${baseDir}/input/${lastDir} -o ${tmpOutputDir} -s ${baseDir}/input/${lastDir}/${myConfig.sample} -t ${timestamp.format("dd-MM-yyyy_HH_mm_ss")}
     """
 }
 
-
-
-process getConsensus {
+process getConsensusLong {
     input:
         tuple val(x)
     output:
@@ -54,21 +78,28 @@ process getConsensus {
     myStringArray=("${x}")
     myArray=\$(echo \$myStringArray | tr -d "[],''" )
     echo \$myArray
-    outputDir=${baseDir}/data/output/${params.data}_${timestamp.format("dd-MM-yyyy_HH_mm_ss")}/cats
+    outputDir=${tmpOutputDir}/${lastDir}_${timestamp.format("dd-MM-yyyy_HH_mm_ss")}/cats
     cd \$outputDir
-    cp ${baseDir}/data/input/${params.data}/${myConfig.reference} \$outputDir
-    #cp ${baseDir}/data/input/${params.data}/${myConfig.genes} \$outputDir
+    cp ${baseDir}/input/${lastDir}/${myConfig.reference} \$outputDir
+
     for i in \${myArray[@]}; do
         echo "Processing \$i"
         minimap2 -a ${myConfig.reference} \${i}.gz > \${i}.sam
         samtools view \${i}.sam > \${i}.bam
         samtools sort \${i}.sam > \${i}_sorted.bam
         samtools index \${i}_sorted.bam
-        samtools mpileup -d ${depth} -A -Q 0 \${i}_sorted.bam | ivar consensus -p \${i}_cns.fasta -q ${min_map_q}  -t ${treshold} -n N
+        #samtools mpileup -uf ${myConfig.reference} \${i}_sorted.bam | bcftools call -c | vcfutils.pl vcf2fq > \${i}_cns.fastq
+        bcftools mpileup -f ${myConfig.reference} \${i}_sorted.bam | bcftools call -c | vcfutils.pl vcf2fq > \${i}_cns.fastq
+        seqtk seq -aQ64 -q 20 -n N \${i}_cns.fastq > \${i}_dirty.fasta
+        #bcftools mpileup -f ${myConfig.reference} \${i}_sorted.bam | bcftools call -c 
+
+        #samtools mpileup -d ${depth} -A -Q 0 \${i}_sorted.bam | ivar consensus -p \${i}_cns.fasta -q ${min_map_q}  -t ${treshold} -n N
         # NUEVO
         #samtools fasta \${i}_sorted.bam > \${i}_converted.fasta
         #/usr/local/bin/quast.py -r ${myConfig.reference} -g ${myConfig.genes} \${i}_converted.fasta
-
+        ## ELIMINA LA PRIMERA LINEA Y LE AGREGA LA CORRECTA
+        tail -n +2 "\${i}_dirty.fasta" > \${i}_cns.fasta
+        sed -i "1i >\${i}" \${i}_cns.fasta
     done
     """
 }
@@ -87,11 +118,11 @@ process nanoplot {
         stdout
     script:
     """
-    nanoplot_wrapper.py -p ${myConfig.path} -s ${myConfig.sample}
+    nanoplot_wrapper.py -p ${myConfig.path} -s ${myConfig.sample} -o ${params.output}
     """
 }
 
 workflow {
-    // nanoplotDocker | view
-    nanoplotDocker | getConsensus | view
+    
+    nanoplotWrapper | getConsensusLong | copyOutputFiles() | view
 }

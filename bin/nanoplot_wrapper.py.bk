@@ -17,10 +17,10 @@ def getVal(num, tab):
             return row['sample'].split('/')[0]
 
 
-def main_fn(barcode_path, output_path, samples, timeStamp):
-    input_data_name = os.path.basename(barcode_path)
-    finalDirName = f"{input_data_name}_{timeStamp}"
-    output_path = os.path.join(output_path, finalDirName)
+def main_fn(barcode_path, output_path, samples):
+    # contenido  = os.listdir(barcode_path)
+    lista_barcodes = []
+    contenido = []
     listado_directorios = []
     filas = []
     code_names = []
@@ -33,11 +33,16 @@ def main_fn(barcode_path, output_path, samples, timeStamp):
                 filas.append(row)
                 listado_directorios.append('barcode'+row['barcode'])
             
-  
+    # for item in contenido:
+    #     if os.path.isdir(os.path.join(barcode_path, item)):
+    #         if((item.startswith('barcode')) and not(item.endswith('a'))):
+    #             listado_directorios.append(item)
+    # print('listado')
+    # print(listado_directorios)
     for index, item in enumerate(listado_directorios):
-        if index >0:
-            break
-            #pass
+        if index >1:
+            # break
+            pass
 
         item_data = mysplit(item)
         dir_number = int(item_data[1])
@@ -48,7 +53,6 @@ def main_fn(barcode_path, output_path, samples, timeStamp):
         
         parent_out_dir = os.path.join(output_path, 'reports')
         parent_cat_dir = os.path.join(output_path,'cats')
-        
         if not os.path.exists(parent_cat_dir):
             Path(parent_cat_dir).mkdir(exist_ok=True, parents=True)
         if not os.path.exists(parent_out_dir):
@@ -73,11 +77,10 @@ parser = argparse.ArgumentParser(description='Nanoplot Wrapper')
 parser.add_argument('-p','--path', help='Path to barcode dirs')
 parser.add_argument('-o','--output', help='Path to output')
 parser.add_argument('-s', '--samples', help='Samples')
-parser.add_argument('-t', '--timestamp', help='Timestamp')
 
 args = parser.parse_args()
 
 if args.path and args.samples:
-    main_fn(args.path, args.output, args.samples, args.timestamp)
+    main_fn(args.path, args.output, args.samples)
 else:
     raise ValueError('Path required')
