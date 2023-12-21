@@ -2,16 +2,10 @@
 @Grab(group='commons-io', module='commons-io', version='2.11.0')
 import groovy.json.JsonSlurper
 import org.apache.commons.io.FileUtils
-<<<<<<< Updated upstream
-nextflow.enable.dsl=2
-
-// params.options = 'config.json'
-=======
 
 params.type = 'l'
 params.debug = false
 params.d = false
->>>>>>> Stashed changes
 params.q = false
 
 def jsonSlurper = new JsonSlurper()
@@ -23,11 +17,7 @@ def configFile = new File("${params.path}/config.json")
 String[] pathList = "${params.path}".split("${systemSeparator}")
 lastDir = pathList[pathList.size() - 1]
 def outputDir = new File("${params.output}")
-<<<<<<< Updated upstream
-def tmpOutputDir = new File("${baseDir}/output")
-=======
 def tmpOutputDir = new File("${baseDir}/data/output")
->>>>>>> Stashed changes
 String configJSON = configFile.text
 
 def myConfig = jsonSlurper.parseText(configJSON)
