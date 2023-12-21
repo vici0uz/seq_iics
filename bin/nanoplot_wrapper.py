@@ -17,7 +17,7 @@ def getVal(num, tab):
             return row['sample'].split('/')[0]
 
 
-def main_fn(barcode_path, output_path, samples, timeStamp):
+def main_fn(barcode_path, output_path, samples, timeStamp, debug):
     input_data_name = os.path.basename(barcode_path)
     finalDirName = f"{input_data_name}_{timeStamp}"
     output_path = os.path.join(output_path, finalDirName)
@@ -35,7 +35,7 @@ def main_fn(barcode_path, output_path, samples, timeStamp):
             
   
     for index, item in enumerate(listado_directorios):
-        if index >0:
+        if (debug and index > 0):
             break
             #pass
 
@@ -74,10 +74,11 @@ parser.add_argument('-p','--path', help='Path to barcode dirs')
 parser.add_argument('-o','--output', help='Path to output')
 parser.add_argument('-s', '--samples', help='Samples')
 parser.add_argument('-t', '--timestamp', help='Timestamp')
+parser.add_argument('-d','--debug-mode', help='Debug mode')
 
 args = parser.parse_args()
 
 if args.path and args.samples:
-    main_fn(args.path, args.output, args.samples, args.timestamp)
+    main_fn(args.path, args.output, args.samples, args.timestamp, args.debug_mode)
 else:
     raise ValueError('Path required')
